@@ -64,28 +64,6 @@ def wta(items):
         if items[i] == maxweight:
             candidates.append(i)
     return rnd.choice(candidates)
-	
-	
-#a weighted random alternative to wta
-def weighted_random (items):
-    listsum = sum(items)
-    treshold = rnd.random()*listsum
-    accumulator = 0
-    for i in range(len(items)):
-        accumulator += items[i]
-        if accumulator >= treshold:
-            return i,items[i]
-			
-# a random weighted by square of weights to account
-# to account for non-linear learning	
-def sq_wr (items):
-    items_sum = sum (element ** 2 for element in items)
-	treshold = rnd.random()*listsum 
-	accumulator = 0
-	for i in range (len(items)):
-		accumulator += items[i]**2
-		if accumulator >=treshold:
-			return items[i]
 
 
 def communicate(speaker_system, hearer_system, meaning):
@@ -94,11 +72,11 @@ def communicate(speaker_system, hearer_system, meaning):
     hearer_system about meaning, where speaker_system and hearer_system are 
     lists of lists representing matrices (i.e. tables) of production and 
     reception weights. Uses production_weights and reception_weights 
-    to retrieve the relevant weights from those matrices, and weighted random (sq_wr) to perform 
+    to retrieve the relevant weights from those matrices, and wta to perform 
     production and reception.
     """
-    speaker_signal = sq_wr(production_weights(speaker_system,meaning))
-    hearer_meaning = sq_wr(reception_weights(hearer_system,speaker_signal))
+    speaker_signal = wta(production_weights(speaker_system,meaning))
+    hearer_meaning = wta(reception_weights(hearer_system,speaker_signal))
     if meaning == hearer_meaning: 
         return 1
     else: 
@@ -125,64 +103,14 @@ def pop_produce(population, no_productions):
     for n in range(no_productions):
         speaker = rnd.choice(population)
         meaning = rnd.randrange(len(speaker))
-        signal = sq_wr(production_weights(speaker, meaning))
+        signal = wta(production_weights(speaker, meaning))
         ms_pairs.append([meaning,signal])
     return ms_pairs
 
 def ca_monte_pop(population, trials):
     total = 0.
     for n in range(trials):
-        speaker_id = rnd.range(len(population))
-        hearer_id = rnd.range(len(population)-1)
-		if hearer_id >= speaker_id:	hearer_id += 1		
-		speaker = population[speaker_id]
-		hearer = population[hearer_id]
+        speaker = rnd.choice(population)
+        hearer = rnd.choice(population)
         total += communicate(speaker, hearer, rnd.randrange(len(speaker)))
     return total / trials
-	
-	#added code
-
-#a weighted random alternative to wta
-def weighted_random (items):
-    listsum = sum(items)
-    treshold = rnd.random()*listsum
-    accumulator = 0
-    for i in range(len(items)):
-        accumulator += items[i]
-        if accumulator >= treshold:
-            return i,items[i]
-			
-# a random weighted by square of weights to account
-# for non-linear learning progression	
-def sq_wr (items):
-    items_sum = sum (element ** 2 for element in items)
-	treshold = rnd.random()*listsum 
-	accumulator = 0
-	for i in range (len(items)):
-		accumulator += items[i]**2
-		if accumulator >=treshold:
-			return items[i]
-	
-	#code adapted from evolution1.py 
-
-
-def random_system(rows,columns):
-    system = []
-    for i in range(rows):
-        row = []
-        for j in range(columns):
-            row.append(rnd.randint(0, mutation_max))
-        system.append(row)
-    return system
-
-def random_population(size):
-    population = []
-    for i in range(size):
-        population.append([random_system(meanings,signals),
-                           random_system(signals,meanings),
-                           [0., 0., 0., 0.]])
-    return population
-	
-	
-
-	

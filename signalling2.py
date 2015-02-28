@@ -54,9 +54,21 @@ def pop_update(population):
                                                   #and hearer are different
     speaker = population[speaker_index]
     hearer = population[hearer_index]
-    meaning = rnd.randrange(len(speaker[0]))
+    meaning = weighted_random(range(len(speaker[0])))
     success = communicate(speaker[0], hearer[1], meaning)
     speaker[2][0] += success
     speaker[2][1] += 1
     hearer[2][2] += success
     hearer[2][3] += 1
+    
+    
+def weighted_random (list_of_options):
+    items = [i+1 for i in range(len(list_of_options))]
+    items_sum = sum(items)
+    treshold = rnd.random()*items_sum
+    accumulator = 0
+    for element_index in range(len(items)):
+        accumulator += items[element_index]
+        if accumulator >= treshold:
+            return element_index
+

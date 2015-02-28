@@ -97,7 +97,7 @@ like writing functions which edit the parameters, will get you in trouble:
 these paremeters are known as global variables, and altering them from within
 a function requires some special syntax we won't cover on this course.
 """
-mutation_rate = 0.001   # probability of mutation per weight
+mutation_rate = 0.001  # probability of mutation per weight
 mutation_max = 1       # maximum value of a random weight
 send_weighting = 10    # weighting factor for send score
 receive_weighting = 10 # weighting factor for receive score
