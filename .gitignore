@@ -17,6 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#course notes
+*.pdf
+
 # =========================
 # Operating System Files
 # =========================
