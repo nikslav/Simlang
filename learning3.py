@@ -37,6 +37,7 @@ in the usual way.
 """ 
 
 import random as rnd
+import matplotlib as plt
 
 def production_weights(system, meaning):
     """
@@ -103,7 +104,7 @@ def learn(system, meaning, signal, rule):
             if m != meaning and s == signal: system[m][s] += rule[2]
             if m != meaning and s != signal: system[m][s] += rule[3]
 
-def pop_learn(population, data, no_learning_episodes, rule):
+def pop_learn_each(population, data, no_learning_episodes, rule):
     """
     Trains a population (a list of agents) on meaning-signal pairs selected 
     randomly from data. Data is a list of meaning-signal pairs, where each item
@@ -112,6 +113,12 @@ def pop_learn(population, data, no_learning_episodes, rule):
     a meaning-signal pair is selected randomly from data, then the learner
     learns fromn that observation according to rule.
     """
+    for learner in (population):
+        for n in range(no_learning_episodes):
+            ms_pair = rnd.choice(data)
+            learn(learner, ms_pair[0], ms_pair[1], rule)
+            
+def pop_learn (population, data, no_learning_episodes, rule):
     for n in range(no_learning_episodes):
         ms_pair = rnd.choice(data)
         learn(rnd.choice(population), ms_pair[0], ms_pair[1], rule)
@@ -147,14 +154,14 @@ def ca_monte_pop(population, trials):
 
 # ----- new code below -----
 
-meanings = 5            # number of meanings
-signals = 5             # number of signals
-interactions = 100      # both the number of utterances produced and the number
-                        # of times this set is randomly sampled for training.
+meanings = 10            # number of meanings
+signals = 10             # number of signals
+interactions_talk = 100 # number of utterances produced and the number
+interactions = 100        # of times this set is randomly sampled for training.
 size = 100              # size of population
 method = 'replacement'  # method of population update
 initial_language_type = 'random' # either 'optimal' or 'random'
-rule = [1, 0, 0, 0]     # learning rule (alpha, beta, gamma, delta)
+rule = [1, 0, 0, 1]     # learning rule (alpha, beta, gamma, delta)
 
 def new_agent(initial_language_type):
     system = []
@@ -174,14 +181,15 @@ def new_population(size,initial_language_type):
         population.append(new_agent(initial_language_type))
     return population
 
-def simulation(generations, mc_trials, report_every):
+def simulation(generations, mc_trials, report_every, method=method):
     population = new_population(size,initial_language_type)
     data_accumulator=[]
     for i in range(generations+1):
-        print '.', #comment this line out if you don't want the dots
+        #print '.', #comment this line out if you don't want the dots
         if (i % report_every == 0):
+            print i
             data_accumulator.append(ca_monte_pop(population, mc_trials))
-        data = pop_produce(population, interactions)
+        data = pop_produce(population, interactions_talk)
         if method == 'chain': 
             population = new_population(size, 'random')
             pop_learn(population, data, interactions, rule)
@@ -194,3 +202,136 @@ def simulation(generations, mc_trials, report_every):
             pop_learn(population, data, interactions, rule)
     return [population,data_accumulator]
 
+"""
+rule = [1,0,0,1]
+chain_sim_const_500_1000_10 = []
+repl_sim_const_500_1000_10 = []
+closed_sim_const_500_1000_10 = []
+chain_sim_const_int_x_100_50_1000_1=[]
+closed_sim_const_50_1000_1 = []
+
+for i in range (100):
+    repl_sim_const_500_1000_10.append(simulation(500,1000, 10, method = 'replacement')) 
+
+for i in range (100):
+    chain_sim_const_500_1000_10.append(simulation(500,1000,10)) 
+    
+for i in range (100):
+    closed_sim_const_500_1000_10.append(simulation(500,1000, 10, method = 'closed')) 
+
+for i in range (100):
+    closed_sim_const_50_1000_1.append(simulation(50,1000, 1, method = 'closed'))   
+    
+rule = [1, 0, 0, 0]
+chain_sim_maint_500_1000_10 = []
+repl_sim_maint_500_1000_10 = []
+closed_sim_maint_500_1000_10 = []
+chain_sim_maint_int_x_100_50_1000_1=[]
+closed_sim_maint_50_1000_1 = []
+
+for i in range (100):
+    repl_sim_maint_500_1000_10.append(simulation(500,1000, 10, method = 'replacement')) 
+
+for i in range (100):
+    chain_sim_maint_500_1000_10.append(simulation(500,1000,10)) 
+    
+for i in range (100):
+    closed_sim_maint_500_1000_10.append(simulation(500,1000, 10, method = 'closed')) 
+
+for i in range (100):
+    closed_sim_maint_50_1000_1.append(simulation(50,1000, 1, method = 'closed')) 
+
+
+interaction = 10000
+for i in range (100):
+    chain_sim_const_int_x_100_50_1000_1.append((simulation(50,1000,1))) 
+
+for i in range (100):
+    chain_sim_maint_int_x_100_50_1000_1.append((simulation(50,1000,1))) 
+"""
+
+rule = [1,0,0,1]
+chain_sim_const_1000_1000_20 = []
+repl_sim_const_1000_1000_20 = []
+closed_sim_const_1000_1000_20 = []
+
+
+for i in range (100):
+    repl_sim_const_1000_1000_20.append(simulation(1000,1000, 20, method = 'replacement')) 
+print '\a'
+for i in range (100):
+    chain_sim_const_1000_1000_20.append(simulation(1000,1000,20)) 
+print '\a'    
+for i in range (100):
+    closed_sim_const_1000_1000_20.append(simulation(1000,1000, 20, method = 'closed')) 
+print '\a'
+
+rule = [1, 0, 0, 0]
+
+chain_sim_maint_1000_1000_20 = []
+repl_sim_maint_1000_1000_20 = []
+closed_sim_maint_1000_1000_20 = []
+
+for i in range (100):
+    repl_sim_maint_1000_1000_20.append(simulation(1000,1000, 20, method = 'replacement')) 
+print '\a'
+for i in range (100):
+    chain_sim_maint_1000_1000_20.append(simulation(1000,1000,20)) 
+print '\a'   
+for i in range (100):
+    closed_sim_maint_1000_1000_20.append(simulation(1000,1000, 20, method = 'closed')) 
+print '\a'
+    
+interaction = 10000
+chain_sim_maint_int_x_100_1000_1000_20 =[]
+chain_sim_const_int_x_100_1000_1000_20 =[]
+closed_sim_maint_int_x_100_100_1000_20=[]
+closed_sim_const_int_x_100_100_1000_20=[]
+
+rule = [1,0,0,1]
+for i in range (100):
+    closed_sim_const_int_x_100_100_1000_20.append(simulation(1000,1000, 20, method = 'closed'))
+
+for i in range (100):
+    chain_sim_const_int_x_100_1000_1000_20.append((simulation(1000,1000,20))) 
+
+rule = [1,0,0,0]
+for i in range (100):
+    closed_sim_maint_int_x_100_100_1000_20.append(simulation(1000,1000, 20, method = 'closed')) 
+
+for i in range (100):
+    chain_sim_maint_int_x_100_1000_1000_20.append((simulation(1000,1000,20)))
+
+ 
+
+    
+f = open( 'd:\sim.py', 'w' )
+f.write(repr(chain_sim_const_1000_1000_20) + '\n' )
+f.write(repr(repl_sim_const_1000_1000_20) + '\n' )
+f.write(repr(closed_sim_const_1000_1000_20) + '\n' )
+f.write(repr(chain_sim_const_int_x_100_1000_1000_20) + '\n' )
+f.write(repr(closed_sim_const_int_x_100_100_1000_20) + '\n' )
+f.write(repr(closed_sim_maint_int_x_100_100_1000_20) + '\n' )
+f.write(repr(chain_sim_maint_1000_1000_20) + '\n' )
+f.write(repr(repl_sim_maint_1000_1000_20) + '\n' )
+f.write(repr(closed_sim_maint_1000_1000_20) + '\n' )
+f.write(repr(chain_sim_maint_int_x_100_1000_1000_20) + '\n' )
+f.write(repr(chain_sim_maint_1000_1000_20) + '\n' )
+f.write(repr(repl_sim_const_1000_1000_20) + '\n' )
+f.close()
+print '\a'
+
+"""for i in range(40):
+    plot(chain_sim_const_1000_1000_20[i][1],'g')
+    plot(repl_sim_const_1000_1000_20[i][1], 'b' )
+    plot(closed_sim_const_1000_1000_20[i][1],'r') 
+    plot(chain_sim_maint_int_x_100_1000_1000_20[i][1],'c')
+    plot(closed_sim_const_int_x_100_100_1000_2[i][1],'m') """
+    
+"""for i in range(40):
+    plot(chain_sim_maint_1000_1000_20[i][1],'g')
+    plot(repl_sim_maint_1000_1000_20[i][1], 'b' )
+    plot(closed_sim_maint_1000_1000_20[i][1],'r') 
+    plot(chain_sim_maint_int_x_100_100_1000_2[i][1],'c')
+    plot(chain_sim_maint_int_x_100_1000_1000_20[i][1],'m') """
+    
